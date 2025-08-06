@@ -73,7 +73,7 @@ export default function RegisterForm() {
             <div>
               Already have an account?
               <Link to="/login">
-                <Button type="button" className="btn-secondary ml-2">
+                <Button type="button" className="btn-secondary btn-sm ml-2">
                   Login
                 </Button>
               </Link>
