@@ -1,6 +1,7 @@
 type InputProps = {
   type?: string;
   name: string;
+  value?: string;
   placeholder?: string;
   required?: boolean;
   className?: string;
@@ -9,6 +10,7 @@ type InputProps = {
 const Input = ({
   type = "text",
   name,
+  value = "",
   placeholder = "",
   required = false,
   className = "",
@@ -20,6 +22,7 @@ const Input = ({
       placeholder={placeholder}
       required={required}
       className={`input ${className}`}
+      value={value}
     />
   );
 };
