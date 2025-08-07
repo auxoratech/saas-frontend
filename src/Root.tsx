@@ -1,4 +1,3 @@
-// Root.tsx
 import { Outlet } from "react-router";
 
 const Root = () => {
