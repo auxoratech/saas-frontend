@@ -7,24 +7,8 @@ type InputProps = {
   className?: string;
 };
 
-const Input = ({
-  type = "text",
-  name,
-  value = "",
-  placeholder = "",
-  required = false,
-  className = "",
-}: InputProps) => {
-  return (
-    <input
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      required={required}
-      className={`input ${className}`}
-      value={value}
-    />
-  );
+const Input = ({ className = "", ...props }: InputProps) => {
+  return <input {...props} className={`input ${className}`} />;
 };
 
 export default Input;

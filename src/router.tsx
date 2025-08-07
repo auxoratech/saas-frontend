@@ -1,18 +1,12 @@
-import { createBrowserRouter, Navigate, Outlet } from "react-router";
-import Root from "./Root";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ResetPassword from "./pages/ResetPassword";
-
-const ProtectedRoute = () => {
-  const isAuthenticated = localStorage.getItem("access_token"); // dummy check
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
-};
-
-const Dashboard = () => {
-  return <div>Dashboard</div>;
-};
-
+import { createBrowserRouter } from "react-router";
+import Root from "@/Root";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import ResetPassword from "@/pages/ResetPassword";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+import Dashboard from "@/pages/Dashboard";
+import NotFound from "@/pages/NotFound";
+import Forbidden from "@/pages/Forbidden";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,9 +16,15 @@ const router = createBrowserRouter([
       { path: "register", Component: Register },
       { path: "reset-password", Component: ResetPassword },
       {
-        element: <ProtectedRoute />,
-        children: [{ path: "dashboard", Component: Dashboard }],
+        path: "dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
       },
+      { path: "forbidden", Component: Forbidden },
+      { path: "*", Component: NotFound },
     ],
   },
 ]);

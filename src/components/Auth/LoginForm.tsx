@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
-import Button from "../ui/button";
-import Card from "../ui/Card";
-import Input from "../ui/Input";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
 
 export default function LoginForm() {
   const navigate = useNavigate();
