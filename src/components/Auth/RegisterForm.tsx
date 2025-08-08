@@ -4,10 +4,13 @@ import Button from "@src/components/ui/Button";
 import Card from "@src/components/ui/Card";
 import Input from "@src/components/ui/Input";
 import { Link } from "react-router";
+import { registerSchema } from "../schema/registerSchema";
+import { ZodError } from "zod";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+
+  const [formData, setFormData] = useState({
     email: "",
     firstName: "",
     lastName: "",
@@ -15,43 +18,27 @@ export default function RegisterForm() {
     confirmPassword: "",
   });
 
-  const [errors, setErrors] = useState<Partial<typeof form>>({});
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const validate = () => {
-    const newErrors: Partial<typeof form> = {};
+  const [errors, setErrors] = useState<Partial<typeof formData>>({});
 
-    if (!form.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(form.email))
-      newErrors.email = "Invalid email format";
-
-    if (!form.firstName) newErrors.firstName = "First name is required";
-    else if (!/^[A-Za-z]+$/.test(form.firstName))
-      newErrors.firstName = "First name should contain only alphabets";
-
-    if (!form.lastName) newErrors.lastName = "Last name is required";
-    else if (!/^[A-Za-z]+$/.test(form.lastName))
-      newErrors.lastName = "Last name should contain only alphabets";
-
-    if (!form.password) newErrors.password = "Password is required";
-    else if (form.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    if (!form.confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password";
-    else if (form.password !== form.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validate()) return;
-    navigate("/login");
+    try {
+      registerSchema.parse(formData);
+      navigate("/login");
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const fieldErrors: Partial<typeof formData> = {};
+        err.issues.forEach((error) => {
+          const fieldName = error.path[0] as keyof typeof formData;
+          fieldErrors[fieldName] = error.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return;
+    }
   };
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -66,7 +53,7 @@ export default function RegisterForm() {
                 type="email"
                 name="email"
                 placeholder="Enter email"
-                value={form.email}
+                value={formData.email}
                 onChange={handleChange}
                 required
                 className="input-primary"
@@ -81,7 +68,7 @@ export default function RegisterForm() {
                 type="text"
                 name="firstName"
                 placeholder="Enter first name"
-                value={form.firstName}
+                value={formData.firstName}
                 onChange={handleChange}
                 required
                 className="input-primary"
@@ -96,7 +83,7 @@ export default function RegisterForm() {
                 type="text"
                 name="lastName"
                 placeholder="Enter last name"
-                value={form.lastName}
+                value={formData.lastName}
                 onChange={handleChange}
                 required
                 className="input-primary"
@@ -111,7 +98,7 @@ export default function RegisterForm() {
                 type="password"
                 name="password"
                 placeholder="Enter password"
-                value={form.password}
+                value={formData.password}
                 onChange={handleChange}
                 required
                 className="input-primary"
@@ -126,7 +113,7 @@ export default function RegisterForm() {
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm password"
-                value={form.confirmPassword}
+                value={formData.confirmPassword}
                 onChange={handleChange}
                 required
                 className="input-primary"

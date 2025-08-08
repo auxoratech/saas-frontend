@@ -4,35 +4,45 @@ import { Link } from "react-router";
 import Button from "@src/components/ui/Button";
 import Card from "@src/components/ui/Card";
 import Input from "@src/components/ui/Input";
+import { loginSchema } from "@src/components/schema/loginSchema";
+import type { LoginFormData } from "@src/components/schema/loginSchema";
+import { ZodError } from "zod";
 
 export default function LoginForm() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {}
-  );
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: "",
+    password: "",
+  });
 
-  const validate = () => {
-    const newErrors: typeof errors = {};
-    if (!email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email))
-      newErrors.email = "Invalid email format";
+  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
 
-    if (!password) newErrors.password = "Password is required";
-    else if (password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validate()) return;
 
-    navigate("/dashboard");
+    try {
+      loginSchema.parse(formData);
+
+      navigate("/dashboard");
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const fieldErrors: Partial<LoginFormData> = {};
+        err.issues.forEach((error) => {
+          const fieldName = error.path[0] as keyof LoginFormData;
+          fieldErrors[fieldName] = error.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return;
+    }
   };
 
   return (
@@ -47,8 +57,8 @@ export default function LoginForm() {
               <Input
                 type="email"
                 name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter email"
                 className="input-primary"
               />
@@ -61,8 +71,8 @@ export default function LoginForm() {
               <Input
                 type="password"
                 name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Enter password"
                 className="input-primary"
               />
