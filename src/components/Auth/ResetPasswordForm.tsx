@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import Button from "@src/components/ui/Button";
 import Card from "@src/components/ui/Card";
@@ -9,10 +8,10 @@ import {
   type resetFormData,
 } from "@src/components/schema/resetSchema";
 import { ZodError } from "zod";
+import { useReset } from "@src/services/reset";
 
 export default function ResetPasswordForm() {
-  const navigate = useNavigate();
-
+  const resetMutation = useReset();
   const [formData, setFormData] = useState<resetFormData>({
     email: "",
     password: "",
@@ -33,7 +32,6 @@ export default function ResetPasswordForm() {
 
     try {
       resetSchema.parse(formData);
-      navigate("/login");
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Partial<resetFormData> = {};
@@ -45,6 +43,11 @@ export default function ResetPasswordForm() {
       }
       return;
     }
+    resetMutation.mutate(formData, {
+      onError: () => {
+        setErrors({ email: "Reset failed. Please try again." });
+      },
+    });
   };
 
   return (
@@ -99,8 +102,12 @@ export default function ResetPasswordForm() {
               )}
             </div>
 
-            <Button type="submit" className="btn-primary">
-              Reset Password
+            <Button
+              type="submit"
+              disabled={resetMutation.isPending}
+              className="btn-primary"
+            >
+              {resetMutation.isPending ? "Resetting..." : "Reset Password"}
             </Button>
             <div>
               Remembered your password?

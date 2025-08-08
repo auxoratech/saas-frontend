@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { Link } from "react-router";
 import Button from "@src/components/ui/Button";
 import Card from "@src/components/ui/Card";
@@ -7,10 +6,10 @@ import Input from "@src/components/ui/Input";
 import { loginSchema } from "@src/components/schema/loginSchema";
 import type { LoginFormData } from "@src/components/schema/loginSchema";
 import { ZodError } from "zod";
+import { useLogin } from "@src/services/login";
 
 export default function LoginForm() {
-  const navigate = useNavigate();
-
+  const loginMutation = useLogin();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -30,8 +29,6 @@ export default function LoginForm() {
 
     try {
       loginSchema.parse(formData);
-
-      navigate("/dashboard");
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Partial<LoginFormData> = {};
@@ -43,6 +40,11 @@ export default function LoginForm() {
       }
       return;
     }
+    loginMutation.mutate(formData, {
+      onError: () => {
+        setErrors({ email: "Login failed. Please check your credentials." });
+      },
+    });
   };
 
   return (
@@ -80,8 +82,12 @@ export default function LoginForm() {
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
-            <Button type="submit" className="btn-primary">
-              Login
+            <Button
+              type="submit"
+              disabled={loginMutation.isPending}
+              className="btn-primary"
+            >
+              {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
             <div>
               Don't have an account?

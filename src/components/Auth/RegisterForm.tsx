@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import Button from "@src/components/ui/Button";
 import Card from "@src/components/ui/Card";
 import Input from "@src/components/ui/Input";
 import { Link } from "react-router";
 import { registerSchema } from "../schema/registerSchema";
 import { ZodError } from "zod";
+import { useRegister } from "@src/services/register";
 
 export default function RegisterForm() {
-  const navigate = useNavigate();
-
+  const registerMutation = useRegister();
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
@@ -27,7 +26,6 @@ export default function RegisterForm() {
     event.preventDefault();
     try {
       registerSchema.parse(formData);
-      navigate("/login");
     } catch (err) {
       if (err instanceof ZodError) {
         const fieldErrors: Partial<typeof formData> = {};
@@ -39,6 +37,11 @@ export default function RegisterForm() {
       }
       return;
     }
+    registerMutation.mutate(formData, {
+      onError: () => {
+        setErrors({ email: "Registration failed. Please try again." });
+      },
+    });
   };
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -122,8 +125,12 @@ export default function RegisterForm() {
                 <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
               )}
             </div>
-            <Button type="submit" className="btn-primary">
-              Register
+            <Button
+              type="submit"
+              disabled={registerMutation.isPending}
+              className="btn-primary"
+            >
+              {registerMutation.isPending ? "Registering..." : "Register"}
             </Button>
             <div>
               Already have an account?
