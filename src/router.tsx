@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router";
-import Root from "@/Root";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import ResetPassword from "@/pages/ResetPassword";
-import ProtectedRoute from "@/components/common/ProtectedRoute";
-import Dashboard from "@/pages/Dashboard";
-import NotFound from "@/pages/NotFound";
-import Forbidden from "@/pages/Forbidden";
+import Root from "@src/Root";
+import Login from "@src/pages/Login";
+import Register from "@src/pages/Register";
+import ResetPassword from "@src/pages/ResetPassword";
+import ProtectedRoute from "@src/components/common/ProtectedRoute";
+import Dashboard from "@src/pages/Dashboard";
+import NotFound from "@src/pages/NotFound";
+import Forbidden from "@src/pages/Forbidden";
 const router = createBrowserRouter([
   {
     path: "/",

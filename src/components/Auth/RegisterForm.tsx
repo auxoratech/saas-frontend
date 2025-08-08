@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import Input from "@/components/ui/Input";
+import Button from "@src/components/ui/Button";
+import Card from "@src/components/ui/Card";
+import Input from "@src/components/ui/Input";
 import { Link } from "react-router";
 
 export default function RegisterForm() {
